@@ -1,3 +1,6 @@
-reroll = 0
-roll = 0
-play = 1
+reroll = 0 false
+roll = 0 false
+play = 1 false
+setChannel = 2 true
+setPermissionRole = 3 true
+grantPermission = 4 true
