@@ -39,6 +39,14 @@ public class CommandExecuter {
 		permittedUsers.add(userName);
 	}
 	
+	public void removePermittedUser(String userName, GuildMessageReceivedEvent event) {
+		try {
+			permittedUsers.remove(permittedUsers.indexOf(userName));
+		} catch (ArrayIndexOutOfBoundsException e) {
+			Voids.sendMessageToCurrentChannel("User " + userName + " does not have permission", event);
+		}
+	}
+	
 	private boolean checkMemberPermission(GuildMessageReceivedEvent event) {
 		boolean result = false;
 		for (String n : permittedRoles) {
