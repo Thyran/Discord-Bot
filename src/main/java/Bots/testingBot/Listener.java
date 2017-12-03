@@ -78,7 +78,7 @@ public class Listener extends ListenerAdapter {
 						}
 					};
 					break;
-				case 3: // addPermissionRole command
+				case 3: // addRolePermission command
 					executer.exec = new Execution() {
 						public void onExecution() {
 							try {
@@ -89,7 +89,16 @@ public class Listener extends ListenerAdapter {
 						}
 					};
 					break;
-				case 4: // addPermissionUser command
+				case 4: // addUserPermission command
+					executer.exec = new Execution() {
+						public void onExecution() {
+							try {
+								executer.addPermittedUser(commandParams[1]);
+							} catch (ArrayIndexOutOfBoundsException e) {
+								Voids.sendMessageToCurrentChannel("addUserPermission command needs Parameter (@Param: UserName)", event);
+							}
+						}
+					};
 					break;
 				case 5: // run command
 					executer.exec = new Execution() {
@@ -98,13 +107,24 @@ public class Listener extends ListenerAdapter {
 						}
 					};
 					break;
-				case 6: // removePermiedRole command
+				case 6: // removeRolePermission command
 					executer.exec = new Execution() {
 						public void onExecution() {
 							try {
 								executer.removePermittedRole(commandParams[1], event);
 							} catch (ArrayIndexOutOfBoundsException e) {
 								Voids.sendMessageToCurrentChannel("setPermissionRole command needs Parameter (@Param: RoleName)", event);
+							}
+						}
+					};
+					break;
+				case 7: // removeUserPermission command
+					executer.exec = new Execution() {
+						public void onExecution() {
+							try {
+								executer.removePermittedUser(commandParams[1], event);
+							} catch (ArrayIndexOutOfBoundsException e) {
+								Voids.sendMessageToCurrentChannel("removeUserPermission command needs Parameter (@Param: UserName)", event);
 							}
 						}
 					};
