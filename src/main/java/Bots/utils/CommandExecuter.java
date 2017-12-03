@@ -2,7 +2,6 @@ package Bots.utils;
 
 import java.util.ArrayList;
 
-import Bots.testingBot.Settings;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.guild.GenericGuildEvent;
@@ -10,13 +9,10 @@ import net.dv8tion.jda.core.events.message.guild.GenericGuildMessageEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandExecuter {
+	
 	private ExecutionSettings settings = new ExecutionSettings();
 	private ArrayList<String> permittedRoles = new ArrayList<String>();
 	private ArrayList<String> permittedUsers = new ArrayList<String>();
-	
-	public static Execution exec = new Execution() {
-		public void onExecution() {	}
-	};
 	
 	public CommandExecuter setSettings(ExecutionSettings settings) {
 		this.settings = settings;
@@ -70,35 +66,48 @@ public class CommandExecuter {
 		return result;
 	}
 	
-	private void checkForPermission(GuildMessageReceivedEvent event, Command command) {
+	private void checkForPermission(Input lastInput, Command command) {
 		if (ExecutionSettings.permission) {
-			if (checkMemberPermission(event)) {
-				checkForChannel(event);
+			if (checkMemberPermission(lastInput.getLastEvent())) {
+				checkForChannel(lastInput, command);
 			} else {
-				Voids.sendMessageToCurrentChannel("You don´t have permission to execute command: " + command.getName(), event);
+				Voids.sendMessageToCurrentChannel("You don´t have permission to execute command: " + command.getName(), lastInput.getLastEvent());
 			}
 		} else {
-			checkForChannel(event);
+			checkForChannel(lastInput, command);
 		}
 	}
 	
-	private void checkForChannel(GuildMessageReceivedEvent event) {
+	private void checkForChannel(Input lastInput, Command command) {
 		if (ExecutionSettings.checkChannel) {
-			if (Settings.isChannelSet() && (event.getChannel().getName().equals(Settings.getChannel()))) {
-				exec.onExecution();
+			if (Settings.isChannelSet() && (lastInput.getLastEvent().getChannel().getName().equals(Settings.getChannel()))) {
+				execute(lastInput, command);
 			} else {
 				if (Settings.isChannelSet()) {
-					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + Settings.getChannel(), event);
+					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + Settings.getChannel(), lastInput.getLastEvent());
 				} else {
-					Voids.sendMessageToCurrentChannel("Set a channel for the Bot first, command: setChannel", event);
+					Voids.sendMessageToCurrentChannel("Set a channel for the Bot first, command: setChannel", lastInput.getLastEvent());
 				}
 			}
 		} else {
-			exec.onExecution();
+			execute(lastInput, command);
 		}
 	}
 	
-	public void executeCommand(GuildMessageReceivedEvent event, Command command) {
-		checkForPermission(event, command);
+	private void execute(Input lastInput, Command command) {
+		Voids.sendMessageToCurrentChannel("Executing command: " + command.getName(), lastInput.getLastEvent());
+		
+		try {
+			command.getExec().onExecution(lastInput, this);
+		} catch (Exception e) {
+			command.getExec().onError(lastInput);
+		}
+	}
+	
+	public void executeCommand(Input lastInput, Command command) {
+		this.setSettings(new ExecutionSettings().setCheckChannel(command.requiresCheckChannel())
+			.setPermission(command.requiresPermission()));
+		
+		checkForPermission(lastInput, command);
 	}
 }
