@@ -31,7 +31,7 @@ public class Commands {
 		while((currentLine = br.readLine()) != null && currentLine.length() != 0) {
 			String[] args = currentLine.split(" ");
 			
-			map.put(args[0], new Command(new Integer(args[2]), new Boolean(args[3])));
+			map.put(args[0], new Command(args[0], new Integer(args[2]), new Boolean(args[3]), new Boolean(args[4])));
 		}
 		
 		br.close();

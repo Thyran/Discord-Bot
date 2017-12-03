@@ -8,11 +8,18 @@ import Bots.utils.CommandExecuter;
 import Bots.utils.Execution;
 import Bots.utils.ExecutionSettings;
 import Bots.utils.Voids;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.events.ReconnectedEvent;
+import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.core.events.role.RoleCreateEvent;
+import net.dv8tion.jda.core.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Listener extends ListenerAdapter {
+	
+	CommandExecuter executer = new CommandExecuter();
 	
 	@Override
 	public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
@@ -21,19 +28,20 @@ public class Listener extends ListenerAdapter {
 	
 	@Override
 	public void onGuildMessageReceived(final GuildMessageReceivedEvent event) {
-		String command = event.getMessage().getContent();
+		String commandStr = event.getMessage().getContent();
 		
-		if (command.charAt(0) == '-') {
-			command = command.substring(1);
-			final String[] commandParams = command.split(" ");
+		if (commandStr.charAt(0) == '-') {
+			commandStr = commandStr.substring(1);
+			final String[] commandParams = commandStr.split(" ");
 		
 			String message = "";
-			CommandExecuter executer = new CommandExecuter();
-			
 			try {
-				switch (((Command) Commands.map.get(commandParams[0])).getCommand()) {
+				final Command command = (Command) Commands.map.get(commandParams[0]);
+				executer.setSettings(new ExecutionSettings().setCheckChannel(command.requiresCheckChannel())
+						.setPermission(command.requiresPermission()));
+				
+				switch (command.getCommand()) {
 				case 0:	// Reroll command
-					executer.setSettings(new ExecutionSettings().setCheckChannel(true));
 					executer.exec = new Execution() {
 						public void onExecution() {
 							Voids.sendMessageToCurrentChannel("executing command: Roll", event);
@@ -53,7 +61,6 @@ public class Listener extends ListenerAdapter {
 					};
 					break;
 				case 1: // Play command
-					executer.setSettings(new ExecutionSettings().setCheckChannel(true));
 					executer.exec = new Execution() {
 						public void onExecution() {
 							Voids.sendMessageToCurrentChannel("executing command: Play", event);
@@ -61,32 +68,59 @@ public class Listener extends ListenerAdapter {
 					};
 					break;
 				case 2: // setChannel command
-					executer.setSettings(new ExecutionSettings().setCheckChannel(false));
 					executer.exec = new Execution() {
 						public void onExecution() {
-							if (event.getGuild().getMembersWithRoles(event.getGuild().getRolesByName("Admin", true).get(0)).contains(event.getMember())) {
-								try {
-									Settings.setChannel(commandParams[1]);
-								} catch (ArrayIndexOutOfBoundsException e) {
-									Voids.sendMessageToCurrentChannel("SetChannel command needs Parameter (@Param: Name)", event);
-								}
-							} else {
-								Voids.sendMessageToCurrentChannel("You don´t have permission to execute command: setChannel", event);
+							try {
+								Settings.setChannel(commandParams[1]);
+							} catch (ArrayIndexOutOfBoundsException e) {
+								Voids.sendMessageToCurrentChannel("SetChannel command needs Parameter (@Param: Name)", event);
 							}
 						}
 					};
 					break;
-				case 3: // setPermissionRole command
+				case 3: // addPermissionRole command
+					executer.exec = new Execution() {
+						public void onExecution() {
+							try {
+								executer.addPermittedRole(commandParams[1]);
+							} catch (ArrayIndexOutOfBoundsException e) {
+								Voids.sendMessageToCurrentChannel("setPermissionRole command needs Parameter (@Param: RoleName)", event);
+							}
+						}
+					};
 					break;
-				case 4: // grantPermission command
+				case 4: // addPermissionUser command
+					break;
+				case 5: // run command
+					executer.exec = new Execution() {
+						public void onExecution() {
+							executer.addPermittedUser(event.getGuild().getOwner().getUser().getName());
+						}
+					};
+					break;
+				case 6: // removePermiedRole command
+					executer.exec = new Execution() {
+						public void onExecution() {
+							try {
+								executer.removePermittedRole(commandParams[1], event);
+							} catch (ArrayIndexOutOfBoundsException e) {
+								Voids.sendMessageToCurrentChannel("setPermissionRole command needs Parameter (@Param: RoleName)", event);
+							}
+						}
+					};
 					break;
 				default:
-					Voids.sendMessageToCurrentChannel("command not known: " + command, event);
+					executer.setSettings(new ExecutionSettings().setCheckChannel(true).setPermission(false));
+					executer.exec = new Execution() {
+						public void onExecution() {
+							Voids.sendMessageToCurrentChannel("command not known: " + command.getName(), event);
+						}
+					};
 					break;
 				}
-				executer.executeCommand(event);
+				executer.executeCommand(event, command);
 			} catch (NullPointerException e) {
-				Voids.sendMessageToCurrentChannel("command not known: " + command, event);
+				Voids.sendMessageToCurrentChannel("command not known: " + commandParams[0], event);
 			}
 		}
 	}
