@@ -1,6 +1,8 @@
-reroll = 0 false
-roll = 0 false
-play = 1 false
-setChannel = 2 true
-setPermissionRole = 3 true
-grantPermission = 4 true
+reroll = 0 true false
+roll = 0 true false
+play = 1 true false
+setChannel = 2 false true
+setPermissionRole = 3 true true
+grantPermission = 4 true true
+run = 5 false false
+removePermissionRole = 6 true true

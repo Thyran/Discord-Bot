@@ -9,8 +9,6 @@ import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 
-
-
 public class App {
 	
     public static void main( String[] args )
