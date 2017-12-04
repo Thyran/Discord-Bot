@@ -1,5 +1,11 @@
 package Bots.utils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.core.entities.Member;
@@ -10,6 +16,10 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandExecuter {
 	
+	private static final String settingsFile = "Settings.txt";
+	private static final String userPermissionStr = "UserPermission = ";
+	private static final String rolePermissionStr = "RolePermission = ";
+	
 	private ExecutionSettings settings = new ExecutionSettings();
 	private ArrayList<String> permittedRoles = new ArrayList<String>();
 	private ArrayList<String> permittedUsers = new ArrayList<String>();
@@ -19,11 +29,77 @@ public class CommandExecuter {
 		return this;
 	}
 	
+	public void loadSettings() {
+		try {
+			FileReader fr = new FileReader("../testingBot/src/main/" + settingsFile);
+			BufferedReader br = new BufferedReader(fr);
+			
+			String currentLine;
+			while((currentLine = br.readLine()) != null && currentLine.length() != 0) {
+				String temp = currentLine;
+				
+				if (temp.substring(0, userPermissionStr.length() -1) == userPermissionStr) {
+					currentLine = currentLine.substring(userPermissionStr.length());
+					try {
+						String[] params = currentLine.split(", ");
+						for (String s : params) {
+							this.permittedUsers.add(s);
+						}
+					} catch (Exception e) {
+						System.out.println("Fehler beim laden der Einstellungen");
+					}
+				} else if (temp.substring(0, rolePermissionStr.length() -1) == rolePermissionStr) {
+					currentLine = currentLine.substring(rolePermissionStr.length());
+					try {
+						String[] params = currentLine.split(", ");
+						for (String s : params) {
+							this.permittedRoles.add(s);
+						}
+					} catch (Exception e) {
+						System.out.println("Fehler beim Laden der Einstellungen");
+					}
+				}
+			}
+			
+			br.close();
+		} catch (IOException e) {
+			System.out.println("Datei nicht gefunden: " + settingsFile);
+		}
+	}
+	
+	public void saveSettings() {
+		try {
+			FileWriter fw = new FileWriter("../testingBot/src/main/" + settingsFile);
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			String permittedUsersStr = "";
+			String permittedRolesStr = "";
+			
+			for (String user : permittedUsers) {
+				permittedUsersStr += user + ", ";
+			}
+			
+			for (String role : permittedRoles) {
+				permittedRolesStr += role + ", ";
+			}
+			
+			bw.flush();
+			bw.newLine();
+			bw.write(userPermissionStr + permittedUsersStr);
+			bw.newLine();
+			bw.write(rolePermissionStr + permittedRolesStr);
+			
+			bw.close();
+		} catch (IOException e) {
+			System.out.println("Fehler beim Speichern der Einstellungen");
+		}
+	}
+	
 	public void addPermittedRole(String roleName) {
 		permittedRoles.add(roleName);
 	}
 	
-	public void removePermittedRole(String roleName, GuildMessageReceivedEvent event) {
+	public void removePermittedRole(String roleName, InputEvent event) {
 		try {
 			permittedRoles.remove(permittedRoles.indexOf(roleName));
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -35,7 +111,7 @@ public class CommandExecuter {
 		permittedUsers.add(userName);
 	}
 	
-	public void removePermittedUser(String userName, GuildMessageReceivedEvent event) {
+	public void removePermittedUser(String userName, InputEvent event) {
 		try {
 			permittedUsers.remove(permittedUsers.indexOf(userName));
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -43,7 +119,7 @@ public class CommandExecuter {
 		}
 	}
 	
-	private boolean checkMemberPermission(GuildMessageReceivedEvent event) {
+	private boolean checkMemberPermission(InputEvent event) {
 		boolean result = false;
 		for (String n : permittedRoles) {
 			for (Member m : (event.getGuild().getMembersWithRoles(event.getGuild().getRolesByName(n, false)))) {

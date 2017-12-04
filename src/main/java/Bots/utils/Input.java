@@ -1,17 +1,15 @@
 package Bots.utils;
 
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-
 public class Input {
 	private String[] lastInput = null;
-	private GuildMessageReceivedEvent event = null;
+	private InputEvent event = null;
 	
 	public Input setLastInput(String[] commandParams) {
 		lastInput = commandParams;
 		return this;
 	}
 	
-	public Input setLastEvent(GuildMessageReceivedEvent event) {
+	public Input setLastEvent(InputEvent event) {
 		this.event = event;
 		return this;
 	}
@@ -20,7 +18,7 @@ public class Input {
 		return lastInput;
 	}
 	
-	public GuildMessageReceivedEvent getLastEvent() {
+	public InputEvent getLastEvent() {
 		return event;
 	}
 }
