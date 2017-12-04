@@ -11,11 +11,13 @@ import java.util.Random;
 
 public class Commands {
 	
+	private static final String commandsFile = "Commands.txt";
+	
 	public static HashMap map = new HashMap();
 	public static final char CommandChar = '-';
 	public static ArrayList<Command> commands = new ArrayList<Command>();
 	
-	private static final Command rerollCommand = new Command("Roll", 0, true, false, new Execution() {
+	public static final Command rerollCommand = new Command("Roll", 0, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			String[] names = lastInput.getLastInput()[1].split(",");
 		
@@ -30,7 +32,7 @@ public class Commands {
 		}
 	});
 	
-	private static final Command playCommand = new Command("Play", 1, true, false, new Execution() {
+	public static final Command playCommand = new Command("Play", 1, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 		}
 		
@@ -38,7 +40,7 @@ public class Commands {
 		}
 	});
 	
-	private static final Command setChannelCommand = new Command("setChannel", 2, false, true, new Execution() {
+	public static final Command setChannelCommand = new Command("setChannel", 2, false, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			Settings.setChannel(lastInput.getLastInput()[1]);
 		}
@@ -48,7 +50,7 @@ public class Commands {
 		}
 	});
 	
-	private static final Command addRolePermissionCommand = new Command("addRolePermission", 3, true, true, new Execution() {
+	public static final Command addRolePermissionCommand = new Command("addRolePermission", 3, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.addPermittedRole(lastInput.getLastInput()[1]);
 		}
@@ -58,7 +60,7 @@ public class Commands {
 		}
 	});
 	
-	private static final Command addUserPermissionCommand = new Command("addUserPermission", 4, true, true, new Execution() {
+	public static final Command addUserPermissionCommand = new Command("addUserPermission", 4, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.addPermittedUser(lastInput.getLastInput()[1]);
 		}
@@ -68,7 +70,7 @@ public class Commands {
 		}
 	});
 	
-	private static final Command runCommand = new Command("run", 5, false, false, new Execution() {
+	public static final Command runCommand = new Command("run", 5, false, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.addPermittedUser(lastInput.getLastEvent().getGuild().getOwner().getUser().getName());
 		}
@@ -78,7 +80,7 @@ public class Commands {
 		}
 	});
 	
-	private static final Command removeRolePermissionCommand = new Command("removeRolePermission", 6, true, true, new Execution() {
+	public static final Command removeRolePermissionCommand = new Command("removeRolePermission", 6, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.removePermittedRole(lastInput.getLastInput()[1], lastInput.getLastEvent());
 		}
@@ -88,7 +90,7 @@ public class Commands {
 		}
 	});
 	
-	private static final Command removeUserPermissionCommand = new Command("removeUserPermission", 7, true, true, new Execution() {
+	public static final Command removeUserPermissionCommand = new Command("removeUserPermission", 7, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.removePermittedUser(lastInput.getLastInput()[1], lastInput.getLastEvent());
 		}
@@ -99,15 +101,10 @@ public class Commands {
 	});
 	
 	public static void init() {
-		
-		try {
-			loadCommands();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		loadCommands();
 	}
 	
-	private static void loadCommands() throws IOException {
+	private static void loadCommands() {
 		
 		commands.add(rerollCommand);
 		commands.add(playCommand);
@@ -118,20 +115,24 @@ public class Commands {
 		commands.add(removeRolePermissionCommand);
 		commands.add(removeUserPermissionCommand);
 		
-		FileReader fr = new FileReader("../testingBot/src/main/Commands.txt");
-		BufferedReader br = new BufferedReader(fr);
-		
-		String currentLine;
-		while((currentLine = br.readLine()) != null && currentLine.length() != 0) {
-			String[] args = currentLine.split(" ");
+		try {
+			FileReader fr = new FileReader("../testingBot/src/main/" + commandsFile);
+			BufferedReader br = new BufferedReader(fr);
 			
-			for (Command c : commands) {
-				if (c.getCommand() == new Integer(args[2])) {
-					map.put(args[0], c);
+			String currentLine;
+			while((currentLine = br.readLine()) != null && currentLine.length() != 0) {
+				String[] args = currentLine.split(" ");
+				
+				for (Command c : commands) {
+					if (c.getCommand() == new Integer(args[2])) {
+						map.put(args[0], c);
+					}
 				}
 			}
+			
+			br.close();
+		} catch (IOException e) {
+			System.out.println("Datei nicht gefunden: " + commandsFile);
 		}
-		
-		br.close();
 	}
 }
