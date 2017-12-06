@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+    <guilds>
+        <guild id="1">
+            <name>guildName1</name>
+            <permittedUsers>
+                <user>userName1</user>
+                <user>userName2</user>
+            </permittedUsers>
+            <permittedRoles>
+                <role>roleName1</role>
+                <role>roleName2</role>
+            </permittedRoles>
+        </guild>
+        <guild id="2">
+            <name>guildName2</name>
+            <permittedUsers>
+                <user>userName1</user>
+                <user>userName2</user>
+            </permittedUsers>
+            <permittedRoles>
+                <role>roleName1</role>
+                <role>roleName2</role>
+            </permittedRoles>
+        </guild>
+    </guilds>
+</settings>

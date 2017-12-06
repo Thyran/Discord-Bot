@@ -16,7 +16,7 @@ public class App {
     	
     	Commands.init();
     	
-        JDABuilder builder = new JDABuilder(AccountType.BOT).setToken(Setup.token).setAutoReconnect(true)
+        JDABuilder builder = new JDABuilder(AccountType.BOT).setToken(Setup.loadToken()).setAutoReconnect(true)
         		.setStatus(OnlineStatus.ONLINE).addEventListener(new Listener());
         JDA bot = builder.buildBlocking();
     }

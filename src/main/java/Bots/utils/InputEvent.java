@@ -11,10 +11,17 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.user.UserOnlineStatusUpdateEvent;
 
 public class InputEvent {
-	private final Guild guild;
-	private final MessageChannel channel;
-	private final User author;
-	private final Member member;
+	private Guild guild;
+	private MessageChannel channel;
+	private User author;
+	private Member member;
+	
+	public InputEvent() {
+		guild = null;
+		channel = null;
+		author = null;
+		member = null;
+	}
 	
 	public InputEvent(GuildMessageReceivedEvent event) {
 		guild = event.getGuild();
@@ -35,6 +42,26 @@ public class InputEvent {
 		channel = null;
 		author = null;
 		member = null;
+	}
+	
+	public InputEvent setGuild(Guild guild) {
+		this.guild = guild;
+		return this;
+	}
+	
+	public InputEvent setChannel(MessageChannel channel) {
+		this.channel = channel;
+		return this;
+	}
+	
+	public InputEvent setAuthor(User author) {
+		this.author = author;
+		return this;
+	}
+	
+	public InputEvent setMember(Member member) {
+		this.member = member;
+		return this;
 	}
 	
 	public Guild getGuild() { return guild; }
