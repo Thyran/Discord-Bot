@@ -7,16 +7,16 @@ import Bots.utils.Commands;
 import Bots.utils.CommandExecuter;
 import Bots.utils.Input;
 import Bots.utils.InputEvent;
+import Bots.utils.SettingsIO;
 import Bots.utils.Execution;
 import Bots.utils.ExecutionSettings;
-import Bots.utils.Settings;
+import Bots.utils.ChannelSettings;
 import Bots.utils.Voids;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.ShutdownEvent;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.core.JDA.Status;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.events.StatusChangeEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.priv.PrivateMessageReceivedEvent;
-import net.dv8tion.jda.core.events.user.UserOnlineStatusUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class Listener extends ListenerAdapter {
@@ -24,21 +24,19 @@ public class Listener extends ListenerAdapter {
 	CommandExecuter executer = new CommandExecuter();
 	
 	@Override
-	public void onReady(ReadyEvent event) {
-		executer.loadSettings();
-	}
-	
-	@Override
-	public void onShutdown(ShutdownEvent event) {
-		executer.saveSettings();
-	}
-	
-	@Override
-	public void onGuildJoin(GuildJoinEvent event) {
-		final Command command = Commands.runCommand;
-		final Input lastInput = new Input().setLastInput(null).setLastEvent(new InputEvent(event));
-		
-		executer.executeCommand(lastInput, command);
+	public void onStatusChange(StatusChangeEvent event) {
+		if (event.getStatus() == Status.CONNECTED) {
+			SettingsIO.loadSettings(executer);
+			final Command command = Commands.runCommand;
+			
+			for (Guild guild : event.getJDA().getGuilds()) {
+				final Input lastInput = new Input().setLastInput(null).setLastEvent(new InputEvent().setGuild(guild));
+				
+				executer.executeCommand(lastInput, command);
+			}
+		} else {
+			SettingsIO.saveSettings(executer);
+		}
 	}
 	
 	@Override

@@ -17,7 +17,7 @@ public class Commands {
 	public static final char CommandChar = '-';
 	public static ArrayList<Command> commands = new ArrayList<Command>();
 	
-	public static final Command rerollCommand = new Command("Roll", 0, true, false, new Execution() {
+	public static final Command rerollCommand = new Command("Roll", 0, true, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			String[] names = lastInput.getLastInput()[1].split(",");
 		
@@ -32,7 +32,7 @@ public class Commands {
 		}
 	});
 	
-	public static final Command playCommand = new Command("Play", 1, true, false, new Execution() {
+	public static final Command playCommand = new Command("Play", 1, true, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 		}
 		
@@ -40,9 +40,9 @@ public class Commands {
 		}
 	});
 	
-	public static final Command setChannelCommand = new Command("setChannel", 2, false, true, new Execution() {
+	public static final Command setChannelCommand = new Command("setChannel", 2, true, false, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
-			Settings.setChannel(lastInput.getLastInput()[1]);
+			ChannelSettings.setChannel(lastInput.getLastInput()[1]);
 		}
 		
 		public void onError(Input lastInput) {
@@ -50,9 +50,9 @@ public class Commands {
 		}
 	});
 	
-	public static final Command addRolePermissionCommand = new Command("addRolePermission", 3, true, true, new Execution() {
+	public static final Command addRolePermissionCommand = new Command("addRolePermission", 3, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
-			executer.addPermittedRole(lastInput.getLastInput()[1]);
+			executer.addPermittedRole(lastInput.getLastInput()[1], lastInput.getLastEvent());
 		}
 		
 		public void onError(Input lastInput) {
@@ -60,9 +60,9 @@ public class Commands {
 		}
 	});
 	
-	public static final Command addUserPermissionCommand = new Command("addUserPermission", 4, true, true, new Execution() {
+	public static final Command addUserPermissionCommand = new Command("addUserPermission", 4, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
-			executer.addPermittedUser(lastInput.getLastInput()[1]);
+			executer.addPermittedUser(lastInput.getLastInput()[1], lastInput.getLastEvent());
 		}
 		
 		public void onError(Input lastInput) {
@@ -70,17 +70,17 @@ public class Commands {
 		}
 	});
 	
-	public static final Command runCommand = new Command("run", 5, false, false, new Execution() {
+	public static final Command runCommand = new Command("run", 5, false, false, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
-			executer.addPermittedUser(lastInput.getLastEvent().getGuild().getOwner().getUser().getName());
+			executer.addPermittedUser(lastInput.getLastEvent().getGuild().getOwner().getUser().getName(), lastInput.getLastEvent());
 		}
 		
 		public void onError(Input lastInput) {
-			
+			System.out.println("Fehler beim Start");
 		}
 	});
 	
-	public static final Command removeRolePermissionCommand = new Command("removeRolePermission", 6, true, true, new Execution() {
+	public static final Command removeRolePermissionCommand = new Command("removeRolePermission", 6, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.removePermittedRole(lastInput.getLastInput()[1], lastInput.getLastEvent());
 		}
@@ -90,7 +90,7 @@ public class Commands {
 		}
 	});
 	
-	public static final Command removeUserPermissionCommand = new Command("removeUserPermission", 7, true, true, new Execution() {
+	public static final Command removeUserPermissionCommand = new Command("removeUserPermission", 7, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.removePermittedUser(lastInput.getLastInput()[1], lastInput.getLastEvent());
 		}

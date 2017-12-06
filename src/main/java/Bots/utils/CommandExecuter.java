@@ -21,99 +21,42 @@ public class CommandExecuter {
 	private static final String rolePermissionStr = "RolePermission = ";
 	
 	private ExecutionSettings settings = new ExecutionSettings();
-	private ArrayList<String> permittedRoles = new ArrayList<String>();
-	private ArrayList<String> permittedUsers = new ArrayList<String>();
+	
+	public ArrayList<String> permittedRoles = new ArrayList<String>();
+	public ArrayList<String> permittedUsers = new ArrayList<String>();
 	
 	public CommandExecuter setSettings(ExecutionSettings settings) {
 		this.settings = settings;
 		return this;
 	}
 	
-	public void loadSettings() {
-		try {
-			FileReader fr = new FileReader("../testingBot/src/main/" + settingsFile);
-			BufferedReader br = new BufferedReader(fr);
-			
-			String currentLine;
-			while((currentLine = br.readLine()) != null && currentLine.length() != 0) {
-				String temp = currentLine;
-				
-				if (temp.substring(0, userPermissionStr.length() -1) == userPermissionStr) {
-					currentLine = currentLine.substring(userPermissionStr.length());
-					try {
-						String[] params = currentLine.split(", ");
-						for (String s : params) {
-							this.permittedUsers.add(s);
-						}
-					} catch (Exception e) {
-						System.out.println("Fehler beim laden der Einstellungen");
-					}
-				} else if (temp.substring(0, rolePermissionStr.length() -1) == rolePermissionStr) {
-					currentLine = currentLine.substring(rolePermissionStr.length());
-					try {
-						String[] params = currentLine.split(", ");
-						for (String s : params) {
-							this.permittedRoles.add(s);
-						}
-					} catch (Exception e) {
-						System.out.println("Fehler beim Laden der Einstellungen");
-					}
-				}
-			}
-			
-			br.close();
-		} catch (IOException e) {
-			System.out.println("Datei nicht gefunden: " + settingsFile);
-		}
+	public void addPermittedRole(String roleName, InputEvent event) {
+		permittedRoles.add(event.getGuild().getName() + "." + roleName);
 	}
 	
-	public void saveSettings() {
-		try {
-			FileWriter fw = new FileWriter("../testingBot/src/main/" + settingsFile);
-			BufferedWriter bw = new BufferedWriter(fw);
-			
-			String permittedUsersStr = "";
-			String permittedRolesStr = "";
-			
-			for (String user : permittedUsers) {
-				permittedUsersStr += user + ", ";
-			}
-			
-			for (String role : permittedRoles) {
-				permittedRolesStr += role + ", ";
-			}
-			
-			bw.flush();
-			bw.newLine();
-			bw.write(userPermissionStr + permittedUsersStr);
-			bw.newLine();
-			bw.write(rolePermissionStr + permittedRolesStr);
-			
-			bw.close();
-		} catch (IOException e) {
-			System.out.println("Fehler beim Speichern der Einstellungen");
-		}
-	}
-	
-	public void addPermittedRole(String roleName) {
-		permittedRoles.add(roleName);
+	public void addPermittedRole(String roleName, String guildName) {
+		permittedRoles.add(guildName + "." + roleName);
 	}
 	
 	public void removePermittedRole(String roleName, InputEvent event) {
 		try {
-			permittedRoles.remove(permittedRoles.indexOf(roleName));
+			permittedRoles.remove(permittedRoles.indexOf(event.getGuild().getName() + "." + roleName));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			Voids.sendMessageToCurrentChannel("Role " + roleName + " does not have permission", event);
 		}
 	}
 	
-	public void addPermittedUser(String userName) {
-		permittedUsers.add(userName);
+	public void addPermittedUser(String userName, InputEvent event) {
+		permittedUsers.add(event.getGuild().getName() + "." + userName);
+	}
+	
+	public void addPermittedUser(String userName, String guildName) {
+		permittedUsers.add(guildName + "." + userName);
 	}
 	
 	public void removePermittedUser(String userName, InputEvent event) {
 		try {
-			permittedUsers.remove(permittedUsers.indexOf(userName));
+			permittedUsers.remove(permittedUsers.indexOf(event.getGuild().getName() + "." + userName));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			Voids.sendMessageToCurrentChannel("User " + userName + " does not have permission", event);
 		}
@@ -122,7 +65,7 @@ public class CommandExecuter {
 	private boolean checkMemberPermission(InputEvent event) {
 		boolean result = false;
 		for (String n : permittedRoles) {
-			for (Member m : (event.getGuild().getMembersWithRoles(event.getGuild().getRolesByName(n, false)))) {
+			for (Member m : (event.getGuild().getMembersWithRoles(event.getGuild().getRolesByName(n.substring(event.getGuild().getName().length()), false)))) {
 				if (m.equals(event.getMember())) {
 					result = true;
 					break;
@@ -131,8 +74,8 @@ public class CommandExecuter {
 		}
 		if (!result) {
 			for (String u : permittedUsers) {
-				for (Member m : (event.getGuild().getMembersByName(u, false))) {
-					if (m.equals(event.getMember())){
+				for (Member m : (event.getGuild().getMembersByName(u.substring(event.getGuild().getName().length()), false))) {
+					if (m.equals(event.getMember())) {
 						result = true;
 						break;
 					}
@@ -156,11 +99,11 @@ public class CommandExecuter {
 	
 	private void checkForChannel(Input lastInput, Command command) {
 		if (ExecutionSettings.checkChannel) {
-			if (Settings.isChannelSet() && (lastInput.getLastEvent().getChannel().getName().equals(Settings.getChannel()))) {
+			if (ChannelSettings.isChannelSet() && (lastInput.getLastEvent().getChannel().getName().equals(ChannelSettings.getChannel()))) {
 				execute(lastInput, command);
 			} else {
-				if (Settings.isChannelSet()) {
-					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + Settings.getChannel(), lastInput.getLastEvent());
+				if (ChannelSettings.isChannelSet()) {
+					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + ChannelSettings.getChannel(), lastInput.getLastEvent());
 				} else {
 					Voids.sendMessageToCurrentChannel("Set a channel for the Bot first, command: setChannel", lastInput.getLastEvent());
 				}
@@ -171,7 +114,8 @@ public class CommandExecuter {
 	}
 	
 	private void execute(Input lastInput, Command command) {
-		Voids.sendMessageToCurrentChannel("Executing command: " + command.getName(), lastInput.getLastEvent());
+		if (command.showExecMessage())
+			Voids.sendMessageToCurrentChannel("Executing command: " + command.getName(), lastInput.getLastEvent());
 		
 		try {
 			command.getExec().onExecution(lastInput, this);
