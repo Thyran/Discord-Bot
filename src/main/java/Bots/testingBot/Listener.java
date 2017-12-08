@@ -3,14 +3,14 @@ package Bots.testingBot;
 import java.util.Random;
 
 import Bots.utils.Command;
-import Bots.utils.Commands;
+import Bots.utils.CommandArchive;
 import Bots.utils.CommandExecuter;
+import Bots.utils.Commands;
 import Bots.utils.Input;
 import Bots.utils.InputEvent;
 import Bots.utils.SettingsIO;
 import Bots.utils.Execution;
 import Bots.utils.ExecutionSettings;
-import Bots.utils.ChannelSettings;
 import Bots.utils.Voids;
 import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.Guild;
@@ -27,15 +27,15 @@ public class Listener extends ListenerAdapter {
 	public void onStatusChange(StatusChangeEvent event) {
 		if (event.getStatus() == Status.CONNECTED) {
 			SettingsIO.loadSettings(executer);
-			final Command command = Commands.runCommand;
+			final Command command = CommandArchive.runCommand;
 			
 			for (Guild guild : event.getJDA().getGuilds()) {
 				final Input lastInput = new Input().setLastInput(null).setLastEvent(new InputEvent().setGuild(guild));
 				
 				executer.executeCommand(lastInput, command);
 			}
-		} else {
-			SettingsIO.saveSettings(executer);
+		} else if (event.getStatus() == Status.DISCONNECTED) {
+			//SettingsIO.saveSettings(executer);
 		}
 	}
 	
@@ -48,7 +48,7 @@ public class Listener extends ListenerAdapter {
 	public void onGuildMessageReceived(final GuildMessageReceivedEvent event) {
 		String commandStr = event.getMessage().getContent();
 		
-		if (commandStr.charAt(0) == '-') {
+		if (commandStr.charAt(0) == Commands.CommandChar) {
 			commandStr = commandStr.substring(1);
 			final String[] commandParams = commandStr.split(" ");
 			

@@ -1,27 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
-    <guilds>
-        <guild id="1">
-            <name>guildName1</name>
-            <permittedUsers>
-                <user>userName1</user>
-                <user>userName2</user>
-            </permittedUsers>
-            <permittedRoles>
-                <role>roleName1</role>
-                <role>roleName2</role>
-            </permittedRoles>
-        </guild>
-        <guild id="2">
-            <name>guildName2</name>
-            <permittedUsers>
-                <user>userName1</user>
-                <user>userName2</user>
-            </permittedUsers>
-            <permittedRoles>
-                <role>roleName1</role>
-                <role>roleName2</role>
-            </permittedRoles>
-        </guild>
-    </guilds>
+	<commands>
+		<commandChar>-</commandChar>
+		<command id="0">
+			<name>RollCommand</name>
+			<id>0</id>
+			<uses>
+				<use>roll</use>
+				<use>reroll</use>
+			</uses>
+		</command>
+		<command id="1">
+			<name>PlayCommand</name>
+			<id>1</id>
+			<uses>
+				<use>play</use>
+			</uses>
+		</command>
+		<command id="2">
+			<name>SetChannelCommand</name>
+			<id>2</id>
+			<uses>
+				<use>setChannel</use>
+			</uses>
+		</command>
+		<command id="3">
+			<name>AddRolePermissionCommand</name>
+			<id>3</id>
+			<uses>
+				<use>addRolePermission</use>
+			</uses>
+		</command>
+		<command id="4">
+			<name>AddUserPermissionCommand</name>
+			<id>4</id>
+			<uses>
+				<use>addUserPermission</use>
+			</uses>
+		</command>
+		<command id="5">
+			<name>RunCommand</name>
+			<id>5</id>
+			<uses>
+				<use>run</use>
+			</uses>
+		</command>
+		<command id="6">
+			<name>RemoveRolePermissionCommand</name>
+			<id>6</id>
+			<uses>
+				<use>removeRolePermission</use>
+			</uses>
+		</command>
+		<command id="7">
+			<name>RemoveUserPermissionCommand</name>
+			<id>7</id>
+			<uses>
+				<use>removeUserPermission</use>
+			</uses>
+		</command>
+		<command id="8">
+			<name>LoadSettingsCommand</name>
+			<id>8</id>
+			<uses>
+				<use>loadSettings</use>
+			</uses>
+		</command>
+		<command id="9">
+			<name>SaveSettingsCommand</name>
+			<id>9</id>
+			<uses>
+				<use>saveSettings</use>
+			</uses>
+		</command>
+		<command id="10">
+			<name>ShowPermittedUsersCommand</name>
+			<id>10</id>
+			<uses>
+				<use>showPermittedUsers</use>
+			</uses>
+		</command>
+		<command id="11">
+			<name>ShowPermittedRolesCommand</name>
+			<id>11</id>
+			<uses>
+				<use>showPermittedRoles</use>
+			</uses>
+		</command>
+		<command id="12">
+			<name>ShowChannelsCommand</name>
+			<id>12</id>
+			<uses>
+				<use>showChannels</use>
+			</uses>
+		</command>
+		<command id="13">
+			<name>AddUseCommand</name>
+			<id>13</id>
+			<uses>
+				<use>addUse</use>
+			</uses>
+		</command>
+		<command id="14">
+			<name>RemoveUseCommand</name>
+			<id>14</id>
+			<uses>
+				<use>removeUse</use>
+			</uses>
+		</command>
+		<command id="15">
+			<name>ShowCommandsCommand</name>
+			<id>15</id>
+			<uses>
+				<use>showCommands</use>
+			</uses>
+		</command>
+		<command id="16">
+			<name>ShowUsesCommand</name>
+			<id>16</id>
+			<uses>
+				<use>showUses</use>
+			</uses>
+		</command>
+	</commands>
+	<guilds>
+		<guild id="0">
+			<name>Development Server</name>
+			<channel>bot-lane</channel>
+			<permittedUsers>
+				<user>Thyran</user>
+			</permittedUsers>
+			<permittedRoles>
+			</permittedRoles>
+		</guild>
+	</guilds>
 </settings>

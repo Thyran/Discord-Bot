@@ -16,47 +16,108 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class CommandExecuter {
 	
-	private static final String settingsFile = "Settings.txt";
-	private static final String userPermissionStr = "UserPermission = ";
-	private static final String rolePermissionStr = "RolePermission = ";
-	
 	private ExecutionSettings settings = new ExecutionSettings();
 	
 	public ArrayList<String> permittedRoles = new ArrayList<String>();
 	public ArrayList<String> permittedUsers = new ArrayList<String>();
+	public ArrayList<String> guildChannels  = new ArrayList<String>();
 	
 	public CommandExecuter setSettings(ExecutionSettings settings) {
 		this.settings = settings;
 		return this;
 	}
 	
+	private boolean doesRoleExist(String roleName, String guildName) {
+		boolean result = false;
+		
+		for (String role : permittedRoles) {
+			String[] params = role.split("/");
+			if (params[0].equals(guildName) && params[1].equals(roleName)) {
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	public void addPermittedRole(String roleName, InputEvent event) {
-		permittedRoles.add(event.getGuild().getName() + "." + roleName);
+		if (!doesRoleExist(roleName, event.getGuild().getName()))
+			permittedRoles.add(event.getGuild().getName() + "/" + roleName);
 	}
 	
 	public void addPermittedRole(String roleName, String guildName) {
-		permittedRoles.add(guildName + "." + roleName);
+		if (!doesRoleExist(roleName, guildName))
+			permittedRoles.add(guildName + "/" + roleName);
 	}
 	
 	public void removePermittedRole(String roleName, InputEvent event) {
 		try {
-			permittedRoles.remove(permittedRoles.indexOf(event.getGuild().getName() + "." + roleName));
+			permittedRoles.remove(permittedRoles.indexOf(event.getGuild().getName() + "/" + roleName));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			Voids.sendMessageToCurrentChannel("Role " + roleName + " does not have permission", event);
 		}
 	}
 	
+	private boolean doesChannelExist(String channelName, String guildName) {
+		boolean result = false;
+		
+		for (String s : guildChannels) {
+			String[] params = s.split("/");
+			if (params[0].equals(guildName) && params[1].equals(channelName)) {
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
+	public void setGuildChannel(String channelName, InputEvent event) {
+		if (doesChannelExist(channelName, event.getGuild().getName())) {
+			int index = guildChannels.indexOf(event.getGuild().getName() + "/" + channelName);
+			guildChannels.set(index, event.getGuild().getName() + "/" + channelName);
+		} else {
+			guildChannels.add(event.getGuild().getName() + "/" + channelName);
+		}
+	}
+	
+	public void setGuildChannel(String channelName, String guild) {
+		if (doesChannelExist(channelName, guild)) {
+			int index = guildChannels.indexOf(guild + "/" + channelName);
+			guildChannels.set(index, guild + "/" + channelName);
+		} else {
+			guildChannels.add(guild + "/" + channelName);
+		}
+	}
+	
+	private boolean doesUserExist(String userName, String guildName) {
+		boolean result = false;
+		
+		for (String user : permittedUsers) {
+			String[] params = user.split("/");
+			if (params[0].equals(guildName) && params[1].equals(userName)) {
+				result = true;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	public void addPermittedUser(String userName, InputEvent event) {
-		permittedUsers.add(event.getGuild().getName() + "." + userName);
+		if (!doesUserExist(userName, event.getGuild().getName()))
+			permittedUsers.add(event.getGuild().getName() + "/" + userName);
 	}
 	
 	public void addPermittedUser(String userName, String guildName) {
-		permittedUsers.add(guildName + "." + userName);
+		if (!doesUserExist(userName, guildName))
+			permittedUsers.add(guildName + "/" + userName);
 	}
 	
 	public void removePermittedUser(String userName, InputEvent event) {
 		try {
-			permittedUsers.remove(permittedUsers.indexOf(event.getGuild().getName() + "." + userName));
+			permittedUsers.remove(permittedUsers.indexOf(event.getGuild().getName() + "/" + userName));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			Voids.sendMessageToCurrentChannel("User " + userName + " does not have permission", event);
 		}
@@ -65,21 +126,27 @@ public class CommandExecuter {
 	private boolean checkMemberPermission(InputEvent event) {
 		boolean result = false;
 		for (String n : permittedRoles) {
-			for (Member m : (event.getGuild().getMembersWithRoles(event.getGuild().getRolesByName(n.substring(event.getGuild().getName().length()), false)))) {
+			String[] params = n.split("/");
+			for (Member m : (event.getGuild().getMembersWithRoles(event.getGuild().getRolesByName(params[1], false)))) {
 				if (m.equals(event.getMember())) {
 					result = true;
 					break;
 				}
 			}
+			if (result)
+				break;
 		}
 		if (!result) {
 			for (String u : permittedUsers) {
-				for (Member m : (event.getGuild().getMembersByName(u.substring(event.getGuild().getName().length()), false))) {
-					if (m.equals(event.getMember())) {
+				String[] params = u.split("/");
+				for (Member m : (event.getGuild().getMembersByName(params[1], false))) {
+					if (m.getUser().getName().equals(event.getMember().getUser().getName())) {
 						result = true;
 						break;
 					}
 				}
+				if (result)
+					break;
 			}
 		}
 		return result;
@@ -97,13 +164,39 @@ public class CommandExecuter {
 		}
 	}
 	
+	private boolean checkChannelSet(InputEvent event) {
+		boolean result = false;
+		
+		String channel = getChannelFromGuild(event);
+		if (event.getChannel().getName().equals(channel)) {
+			result = true;
+		}
+		
+		return result;
+	}
+	
+	private String getChannelFromGuild(InputEvent event) {
+		String result = "";
+		
+		for (String channel : guildChannels) {
+			String[] params = channel.split("/");
+			
+			if (event.getGuild().getName().equals(params[0])) {
+				result = params[1];
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	private void checkForChannel(Input lastInput, Command command) {
 		if (ExecutionSettings.checkChannel) {
-			if (ChannelSettings.isChannelSet() && (lastInput.getLastEvent().getChannel().getName().equals(ChannelSettings.getChannel()))) {
+			if (checkChannelSet(lastInput.getLastEvent())) {
 				execute(lastInput, command);
 			} else {
-				if (ChannelSettings.isChannelSet()) {
-					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + ChannelSettings.getChannel(), lastInput.getLastEvent());
+				if (!getChannelFromGuild(lastInput.getLastEvent()).equals("")) {
+					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + getChannelFromGuild(lastInput.getLastEvent()), lastInput.getLastEvent());
 				} else {
 					Voids.sendMessageToCurrentChannel("Set a channel for the Bot first, command: setChannel", lastInput.getLastEvent());
 				}
