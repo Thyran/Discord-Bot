@@ -2,6 +2,7 @@ package Bots.utils;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -15,12 +16,14 @@ public class InputEvent {
 	private MessageChannel channel;
 	private User author;
 	private Member member;
+	private Message message;
 	
 	public InputEvent() {
 		guild = null;
 		channel = null;
 		author = null;
 		member = null;
+		message = null;
 	}
 	
 	public InputEvent(GuildMessageReceivedEvent event) {
@@ -28,6 +31,7 @@ public class InputEvent {
 		channel = (MessageChannel) event.getChannel();
 		author = event.getAuthor();
 		member = event.getMember();
+		message = event.getMessage();
 	}
 	
 	public InputEvent(GuildJoinEvent event) {
@@ -35,6 +39,7 @@ public class InputEvent {
 		channel = null;
 		author = null;
 		member = null;
+		message = null;
 	}
 	
 	public InputEvent(UserOnlineStatusUpdateEvent event) {
@@ -42,6 +47,7 @@ public class InputEvent {
 		channel = null;
 		author = null;
 		member = null;
+		message = null;
 	}
 	
 	public InputEvent setGuild(Guild guild) {
@@ -64,10 +70,16 @@ public class InputEvent {
 		return this;
 	}
 	
+	public InputEvent setMessage(Message message) {
+		this.message = message;
+		return this;
+	}
+	
 	public Guild getGuild() { return guild; }
 	public MessageChannel getChannel() { return channel; }
 	public TextChannel getTextChannel() { return (TextChannel) channel; }
 	public PrivateChannel getPrivateChannel() { return (PrivateChannel) channel; }
 	public User getAuthor() { return author; }
-	public Member getMember() { return member; } 
+	public Member getMember() { return member; }
+	public Message getMessage() { return message; }
 }

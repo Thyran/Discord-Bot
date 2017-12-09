@@ -11,115 +11,157 @@
 			</uses>
 		</command>
 		<command id="1">
-			<name>PlayCommand</name>
-			<id>1</id>
-			<uses>
-				<use>play</use>
-			</uses>
-		</command>
-		<command id="2">
 			<name>SetChannelCommand</name>
-			<id>2</id>
+			<id>1</id>
 			<uses>
 				<use>setChannel</use>
 			</uses>
 		</command>
-		<command id="3">
+		<command id="2">
 			<name>AddRolePermissionCommand</name>
-			<id>3</id>
+			<id>2</id>
 			<uses>
 				<use>addRolePermission</use>
 			</uses>
 		</command>
-		<command id="4">
+		<command id="3">
 			<name>AddUserPermissionCommand</name>
-			<id>4</id>
+			<id>3</id>
 			<uses>
 				<use>addUserPermission</use>
 			</uses>
 		</command>
-		<command id="5">
+		<command id="4">
 			<name>RunCommand</name>
-			<id>5</id>
+			<id>4</id>
 			<uses>
 				<use>run</use>
 			</uses>
 		</command>
-		<command id="6">
+		<command id="5">
 			<name>RemoveRolePermissionCommand</name>
-			<id>6</id>
+			<id>5</id>
 			<uses>
 				<use>removeRolePermission</use>
 			</uses>
 		</command>
-		<command id="7">
+		<command id="6">
 			<name>RemoveUserPermissionCommand</name>
-			<id>7</id>
+			<id>6</id>
 			<uses>
 				<use>removeUserPermission</use>
 			</uses>
 		</command>
-		<command id="8">
+		<command id="7">
 			<name>LoadSettingsCommand</name>
-			<id>8</id>
+			<id>7</id>
 			<uses>
 				<use>loadSettings</use>
 			</uses>
 		</command>
-		<command id="9">
+		<command id="8">
 			<name>SaveSettingsCommand</name>
-			<id>9</id>
+			<id>8</id>
 			<uses>
 				<use>saveSettings</use>
 			</uses>
 		</command>
-		<command id="10">
+		<command id="9">
 			<name>ShowPermittedUsersCommand</name>
-			<id>10</id>
+			<id>9</id>
 			<uses>
 				<use>showPermittedUsers</use>
 			</uses>
 		</command>
-		<command id="11">
+		<command id="10">
 			<name>ShowPermittedRolesCommand</name>
-			<id>11</id>
+			<id>10</id>
 			<uses>
 				<use>showPermittedRoles</use>
 			</uses>
 		</command>
-		<command id="12">
+		<command id="11">
 			<name>ShowChannelsCommand</name>
-			<id>12</id>
+			<id>11</id>
 			<uses>
 				<use>showChannels</use>
 			</uses>
 		</command>
-		<command id="13">
+		<command id="12">
 			<name>AddUseCommand</name>
-			<id>13</id>
+			<id>12</id>
 			<uses>
 				<use>addUse</use>
 			</uses>
 		</command>
-		<command id="14">
+		<command id="13">
 			<name>RemoveUseCommand</name>
-			<id>14</id>
+			<id>13</id>
 			<uses>
 				<use>removeUse</use>
 			</uses>
 		</command>
-		<command id="15">
+		<command id="14">
 			<name>ShowCommandsCommand</name>
-			<id>15</id>
+			<id>14</id>
 			<uses>
 				<use>showCommands</use>
 			</uses>
 		</command>
-		<command id="16">
+		<command id="15">
 			<name>ShowUsesCommand</name>
-			<id>16</id>
+			<id>15</id>
 			<uses>
 				<use>showUses</use>
+			</uses>
+		</command>
+		<command id="16">
+			<name>PlayTrackCommand</name>
+			<id>16</id>
+			<uses>
+				<use>play</use>
+			</uses>
+		</command>
+		<command id="17">
+			<name>SkipTrackCommand</name>
+			<id>17</id>
+			<uses>
+				<use>skip</use>
+			</uses>
+		</command>
+		<command id="18">
+			<name>StopTrackCommand</name>
+			<id>18</id>
+			<uses>
+				<use>stop</use>
+			</uses>
+		</command>
+		<command id="19">
+			<name>ShufflePlaylistCommand</name>
+			<id>19</id>
+			<uses>
+				<use>shuffle</use>
+			</uses>
+		</command>
+		<command id="20">
+			<name>CurrentTrackCommand</name>
+			<id>20</id>
+			<uses>
+				<use>currentTrack</use>
+				<use>now</use>
+			</uses>
+		</command>
+		<command id="21">
+			<name>CurrentQueueCommand</name>
+			<id>21</id>
+			<uses>
+				<use>currentQueue</use>
+			</uses>
+		</command>
+		<command id="100">
+			<name>TestCommand</name>
+			<id>100</id>
+			<uses>
 			</uses>
 		</command>
 	</commands>

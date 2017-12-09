@@ -1,8 +1,18 @@
 package Bots.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+
+import net.dv8tion.jda.core.EmbedBuilder;
 
 public class CommandArchive {
+	private static MusicManager musicManager = new MusicManager();
+	
 	public static final Command rerollCommand = new Command("Roll", 0, true, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			String[] names = lastInput.getLastInput()[1].split(",");
@@ -18,15 +28,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command playCommand = new Command("Play", 1, true, true, false, new Execution() {
-		public void onExecution(Input lastInput, CommandExecuter executer) {
-		}
-		
-		public void onError(Input lastInput) {
-		}
-	});
-	
-	public static final Command setChannelCommand = new Command("SetChannel", 2, true, false, true, new Execution() {
+	public static final Command setChannelCommand = new Command("SetChannel", 1, true, false, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.setGuildChannel(lastInput.getLastEvent().getChannel().getName(), lastInput.getLastEvent());
 			SettingsIO.saveSettings(executer);
@@ -37,7 +39,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command addRolePermissionCommand = new Command("AddRolePermission", 3, true, true, true, new Execution() {
+	public static final Command addRolePermissionCommand = new Command("AddRolePermission", 2, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.addPermittedRole(lastInput.getLastInput()[1], lastInput.getLastEvent());
 			SettingsIO.saveSettings(executer);
@@ -48,7 +50,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command addUserPermissionCommand = new Command("AddUserPermission", 4, true, true, true, new Execution() {
+	public static final Command addUserPermissionCommand = new Command("AddUserPermission", 3, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.addPermittedUser(lastInput.getLastInput()[1], lastInput.getLastEvent());
 			SettingsIO.saveSettings(executer);
@@ -59,7 +61,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command runCommand = new Command("Run", 5, false, false, false, new Execution() {
+	public static final Command runCommand = new Command("Run", 4, false, false, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.addPermittedUser(lastInput.getLastEvent().getGuild().getOwner().getUser().getName(), lastInput.getLastEvent());
 			SettingsIO.saveSettings(executer);
@@ -70,7 +72,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command removeRolePermissionCommand = new Command("RemoveRolePermission", 6, true, true, true, new Execution() {
+	public static final Command removeRolePermissionCommand = new Command("RemoveRolePermission", 5, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.removePermittedRole(lastInput.getLastInput()[1], lastInput.getLastEvent());
 			SettingsIO.saveSettings(executer);
@@ -81,7 +83,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command removeUserPermissionCommand = new Command("RemoveUserPermission", 7, true, true, true, new Execution() {
+	public static final Command removeUserPermissionCommand = new Command("RemoveUserPermission", 6, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			executer.removePermittedUser(lastInput.getLastInput()[1], lastInput.getLastEvent());
 			SettingsIO.saveSettings(executer);
@@ -92,7 +94,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command loadSettingsCommand = new Command("LoadSettings", 8, true, true, true, new Execution() {
+	public static final Command loadSettingsCommand = new Command("LoadSettings", 7, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			SettingsIO.loadSettings(executer);
 		}
@@ -102,7 +104,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command saveSettingsCommand = new Command("SaveSettings", 9, true, true, true, new Execution() {
+	public static final Command saveSettingsCommand = new Command("SaveSettings", 8, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			SettingsIO.saveSettings(executer);
 		}
@@ -112,7 +114,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command showPermittedUsersCommand = new Command("ShowPermittedUsers", 10, true, true, true, new Execution() {
+	public static final Command showPermittedUsersCommand = new Command("ShowPermittedUsers", 9, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			for (String user : executer.permittedUsers) {
 				Voids.sendMessageToCurrentChannel(user, lastInput.getLastEvent());
@@ -124,7 +126,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command showPermittedRolesCommand = new Command("ShowPermittedRoles", 11, true, true, true, new Execution() {
+	public static final Command showPermittedRolesCommand = new Command("ShowPermittedRoles", 10, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			for (String role : executer.permittedRoles) {
 				Voids.sendMessageToCurrentChannel(role, lastInput.getLastEvent());
@@ -136,7 +138,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command showChannelsCommand = new Command("ShowChannels", 12, true, true, true, new Execution() {
+	public static final Command showChannelsCommand = new Command("ShowChannels", 11, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			for (String channel : executer.guildChannels) {
 				Voids.sendMessageToCurrentChannel(channel, lastInput.getLastEvent());
@@ -148,7 +150,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command addUseCommand = new Command("AddUse", 13, true, true, true, new Execution() {
+	public static final Command addUseCommand = new Command("AddUse", 12, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			String command = lastInput.getLastInput()[1];
 			String use = lastInput.getLastInput()[2];
@@ -162,7 +164,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command removeUseCommand = new Command("RemoveUse", 14, true, true, true, new Execution() {
+	public static final Command removeUseCommand = new Command("RemoveUse", 13, true, true, true, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			String command = lastInput.getLastInput()[1];
 			String use = lastInput.getLastInput()[2];
@@ -176,7 +178,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command showCommandsCommand = new Command("ShowCommands", 15, true, true, false, new Execution() {
+	public static final Command showCommandsCommand = new Command("ShowCommands", 14, true, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			for (Command c : Commands.commands) {
 				Voids.sendMessageToCurrentChannel(c.getName(), lastInput.getLastEvent());
@@ -188,7 +190,7 @@ public class CommandArchive {
 		}
 	});
 	
-	public static final Command showCommandUsesCommand = new Command("ShowUses", 16, true, true, false, new Execution() {
+	public static final Command showCommandUsesCommand = new Command("ShowUses", 15, true, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
 			String command = lastInput.getLastInput()[1];
 			
@@ -205,6 +207,129 @@ public class CommandArchive {
 		
 		public void onError(Input lastInput) {
 			Voids.sendMessageToCurrentChannel("ShowUse command needs Parameters (@Param: commandName)", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command playTrackCommand = new Command("PlayTrack", 16, false, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			String track = lastInput.getLastInput()[1];
+			if (!(track.startsWith("https://") || track.startsWith("http://")))
+				track = "ytsearch: " + track;
+			
+			musicManager.loadTrack(track, lastInput.getLastEvent().getMember());
+			
+			try {
+				Thread.sleep(1000);
+				executer.appendCommandExecution(new CommandExecution(new Input().setLastEvent(null).setLastEvent(lastInput.getLastEvent()), currentTrackCommand));
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		public void onError(Input lastInput) {
+			Voids.sendMessageToCurrentChannel("Play command needs Paramters (@Param: track)", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command skipTrackCommand = new Command("SkipTrack", 17, true, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			if (!musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
+				musicManager.skip(lastInput.getLastEvent().getGuild());
+			}
+		}
+		
+		public void onError(Input lastInput) {
+			Voids.sendMessageToCurrentChannel("Fehler beim skippen des Tracks", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command stopTrackCommand = new Command("StopTrack", 18, true, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			if (!musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
+				musicManager.getManager(lastInput.getLastEvent().getGuild()).clearQueue();
+				musicManager.skip(lastInput.getLastEvent().getGuild());
+				lastInput.getLastEvent().getGuild().getAudioManager().closeAudioConnection();
+			}
+		}
+		
+		public void onError(Input lastInput) {
+			Voids.sendMessageToCurrentChannel("Fehler beim stoppen des Tracks", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command shufflePlaylistCommand = new Command("ShufflePlaylist", 19, true, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			if (!musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
+				musicManager.getManager(lastInput.getLastEvent().getGuild()).shuffleQueue();
+			}
+		}
+		
+		public void onError(Input lastInput) {
+			Voids.sendMessageToCurrentChannel("Fehler beim shufflen der Playlist", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command currentTrackCommand = new Command("CurrentTrack", 20, true, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			if (!musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
+				AudioTrack track = musicManager.getPlayer(lastInput.getLastEvent().getGuild()).getPlayingTrack();
+				AudioTrackInfo info = track.getInfo();
+				
+				Voids.sendMessageToCurrentChannel(new EmbedBuilder()
+					.setDescription("**CURRENT TRACK INFO:**")
+					.addField("Title", info.title, false)
+					.addField("Duration", "`[ " + musicManager.getTimestamp(track.getPosition()) + "/ " + musicManager.getTimestamp(track.getDuration()) + " ]`", false)
+					.addField("Author", info.author, false)
+					.build(), lastInput.getLastEvent());
+			}
+		}
+		
+		public void onError(Input lastInput) {
+			Voids.sendMessageToCurrentChannel("Fehler beim Anzeigen des aktuellen Tracks", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command currentQueueCommand = new Command("CurrentQueue", 21, true, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			if (!musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
+				int sideNumb = lastInput.getLastInput().length;
+				
+				List<String> tracks = new ArrayList<String>();
+				List<String> trackSublist;
+				
+				musicManager.getManager(lastInput.getLastEvent().getGuild()).getQueue().forEach(audioInfo -> tracks.add(musicManager.buildQueueMessage(audioInfo)));
+				if (tracks.size() > 20) {
+					trackSublist = tracks.subList((sideNumb -1)*20, (sideNumb -1)*20 + 20);
+				} else {
+					trackSublist = tracks;
+				}
+				
+				String out = trackSublist.stream().collect(Collectors.joining("\n"));
+				int sideNumbAll = tracks.size() >= 20 ? tracks.size() / 20 : 1;
+				
+				Voids.sendMessageToCurrentChannel(new EmbedBuilder()
+					.setDescription(
+							"**CURRENT QUEUE:**\n" +
+							"*[" + musicManager.getManager(lastInput.getLastEvent().getGuild()).getQueue().stream() +
+							" Tracks | Side " + sideNumb + " / " + sideNumbAll + "]*" +
+							out)
+					.build(), lastInput.getLastEvent());
+			}
+		}
+		
+		public void onError(Input lastInput) {
+			Voids.sendMessageToCurrentChannel("Fehler beim Anzeigen der Aktuellen Queue", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command testCommand = new Command("Test", 100, true, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			
+			
+		}
+		
+		public void onError(Input lastInput) {
+			
 		}
 	});
 }
