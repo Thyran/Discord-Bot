@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.Event;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 public class CommandExecuter {
 	
 	private ExecutionSettings settings = new ExecutionSettings();
+	private Queue<CommandExecution> commandQueue = new LinkedBlockingQueue<CommandExecution>();
 	
 	public ArrayList<String> permittedRoles = new ArrayList<String>();
 	public ArrayList<String> permittedUsers = new ArrayList<String>();
@@ -152,15 +155,15 @@ public class CommandExecuter {
 		return result;
 	}
 	
-	private void checkForPermission(Input lastInput, Command command) {
+	private void checkForPermission(CommandExecution execution) {
 		if (ExecutionSettings.permission) {
-			if (checkMemberPermission(lastInput.getLastEvent())) {
-				checkForChannel(lastInput, command);
+			if (checkMemberPermission(execution.getLastInput().getLastEvent())) {
+				checkForChannel(execution);
 			} else {
-				Voids.sendMessageToCurrentChannel("You don´t have permission to execute command: " + command.getName(), lastInput.getLastEvent());
+				Voids.sendMessageToCurrentChannel("You don´t have permission to execute command: " + execution.getCommand().getName(), execution.getLastInput().getLastEvent());
 			}
 		} else {
-			checkForChannel(lastInput, command);
+			checkForChannel(execution);
 		}
 	}
 	
@@ -190,37 +193,63 @@ public class CommandExecuter {
 		return result;
 	}
 	
-	private void checkForChannel(Input lastInput, Command command) {
+	private void checkForChannel(CommandExecution execution) {
 		if (ExecutionSettings.checkChannel) {
-			if (checkChannelSet(lastInput.getLastEvent())) {
-				execute(lastInput, command);
+			if (checkChannelSet(execution.getLastInput().getLastEvent())) {
+				execute(execution);
 			} else {
-				if (!getChannelFromGuild(lastInput.getLastEvent()).equals("")) {
-					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + getChannelFromGuild(lastInput.getLastEvent()), lastInput.getLastEvent());
+				if (!getChannelFromGuild(execution.getLastInput().getLastEvent()).equals("")) {
+					Voids.sendMessageToCurrentChannel("Use the Bot´s channel for commands: " + 
+						getChannelFromGuild(execution.getLastInput().getLastEvent()), execution.getLastInput().getLastEvent());
 				} else {
-					Voids.sendMessageToCurrentChannel("Set a channel for the Bot first, command: setChannel", lastInput.getLastEvent());
+					Voids.sendMessageToCurrentChannel("Set a channel for the Bot first, command: setChannel", execution.getLastInput().getLastEvent());
 				}
 			}
 		} else {
-			execute(lastInput, command);
+			execute(execution);
 		}
 	}
 	
-	private void execute(Input lastInput, Command command) {
-		if (command.showExecMessage())
-			Voids.sendMessageToCurrentChannel("Executing command: " + command.getName(), lastInput.getLastEvent());
+	private void execute(CommandExecution execution) {
+		if (execution.getCommand().showExecMessage()) {
+			String paramString = "";
+			try {
+				if (execution.getLastInput().getLastInput().length > 1) {
+					paramString += ", with params: ";
+					for (int i = 1; i < execution.getLastInput().getLastInput().length -1; i++)
+						paramString += execution.getLastInput().getLastInput()[i] + ", ";
+					paramString += execution.getLastInput().getLastInput()[execution.getLastInput().getLastInput().length -1];
+				}
+			} catch (NullPointerException e) {
+				paramString = "";
+			}
+			Voids.sendMessageToCurrentChannel("Executing command: " + execution.getCommand().getName() + 
+				paramString, execution.getLastInput().getLastEvent());
+		}
 		
 		try {
-			command.getExec().onExecution(lastInput, this);
+			execution.getCommand().getExec().onExecution(execution.getLastInput(), this);
 		} catch (Exception e) {
-			command.getExec().onError(lastInput);
+			execution.getCommand().getExec().onError(execution.getLastInput());
 		}
 	}
 	
-	public void executeCommand(Input lastInput, Command command) {
-		this.setSettings(new ExecutionSettings().setCheckChannel(command.requiresCheckChannel())
-			.setPermission(command.requiresPermission()));
+	public void executeCommand(CommandExecution execution) {
+		this.setSettings(new ExecutionSettings().setCheckChannel(execution.getCommand().requiresCheckChannel())
+			.setPermission(execution.getCommand().requiresPermission()));
 		
-		checkForPermission(lastInput, command);
+		checkForPermission(execution);
+		
+		while (!commandQueue.isEmpty()) {
+			CommandExecution exec = commandQueue.poll();
+			this.setSettings(new ExecutionSettings().setCheckChannel(exec.getCommand().requiresCheckChannel())
+				.setPermission(exec.getCommand().requiresPermission()));
+			
+			checkForPermission(exec);
+		}
+	}
+	
+	public void appendCommandExecution(CommandExecution execution) {
+		commandQueue.add(execution);
 	}
 }

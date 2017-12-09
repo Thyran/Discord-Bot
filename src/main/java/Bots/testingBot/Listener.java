@@ -5,6 +5,7 @@ import java.util.Random;
 import Bots.utils.Command;
 import Bots.utils.CommandArchive;
 import Bots.utils.CommandExecuter;
+import Bots.utils.CommandExecution;
 import Bots.utils.Commands;
 import Bots.utils.Input;
 import Bots.utils.InputEvent;
@@ -32,10 +33,10 @@ public class Listener extends ListenerAdapter {
 			for (Guild guild : event.getJDA().getGuilds()) {
 				final Input lastInput = new Input().setLastInput(null).setLastEvent(new InputEvent().setGuild(guild));
 				
-				executer.executeCommand(lastInput, command);
+				executer.executeCommand(new CommandExecution(lastInput, command));
 			}
 		} else if (event.getStatus() == Status.DISCONNECTED) {
-			//SettingsIO.saveSettings(executer);
+			SettingsIO.saveSettings(executer);
 		}
 	}
 	
@@ -48,19 +49,23 @@ public class Listener extends ListenerAdapter {
 	public void onGuildMessageReceived(final GuildMessageReceivedEvent event) {
 		String commandStr = event.getMessage().getContent();
 		
-		if (commandStr.charAt(0) == Commands.CommandChar) {
-			commandStr = commandStr.substring(1);
-			final String[] commandParams = commandStr.split(" ");
-			
-			Input lastInput = new Input().setLastInput(commandParams).setLastEvent(new InputEvent(event));
-
-			try {
-				final Command command = (Command) Commands.map.get(commandParams[0]);
+		try {
+			if (commandStr.charAt(0) == Commands.CommandChar) {
+				commandStr = commandStr.substring(1);
+				final String[] commandParams = commandStr.split(" ");
 				
-				executer.executeCommand(lastInput, command);
-			} catch (NullPointerException e) {
-				Voids.sendMessageToCurrentChannel("command not known: " + commandParams[0], new InputEvent(event));
+				Input lastInput = new Input().setLastInput(commandParams).setLastEvent(new InputEvent(event));
+		
+				try {
+					final Command command = (Command) Commands.map.get(commandParams[0]);
+					
+					executer.executeCommand(new CommandExecution(lastInput, command));
+				} catch (NullPointerException e) {
+					Voids.sendMessageToCurrentChannel("command not known: " + commandParams[0], new InputEvent(event));
+				}
 			}
+		} catch (StringIndexOutOfBoundsException e) {
+			
 		}
 	}
 }

@@ -15,9 +15,7 @@ import java.util.Random;
  *     Command command = new Command(commandName, commandID, executionMessage?, checkChannels?, checkPermission?, Execution);
  */
 public class Commands {
-	
-	private static final String commandsFile = "Commands.txt";
-	
+
 	public static HashMap map = new HashMap();
 	public static char CommandChar = '-';
 	public static ArrayList<Command> commands = new ArrayList<Command>();
@@ -77,9 +75,7 @@ public class Commands {
 	}
 	
 	private static void loadCommands() {
-		
 		commands.add(CommandArchive.rerollCommand);
-		commands.add(CommandArchive.playCommand);
 		commands.add(CommandArchive.setChannelCommand);
 		commands.add(CommandArchive.addRolePermissionCommand);
 		commands.add(CommandArchive.addUserPermissionCommand);
@@ -95,25 +91,12 @@ public class Commands {
 		commands.add(CommandArchive.removeUseCommand);
 		commands.add(CommandArchive.showCommandsCommand);
 		commands.add(CommandArchive.showCommandUsesCommand);
-		
-		/*try {
-			FileReader fr = new FileReader("../testingBot/src/main/" + commandsFile);
-			BufferedReader br = new BufferedReader(fr);
-			
-			String currentLine;
-			while((currentLine = br.readLine()) != null && currentLine.length() != 0) {
-				String[] args = currentLine.split(" ");
-				
-				for (Command c : commands) {
-					if (c.getCommand() == new Integer(args[2])) {
-						map.put(args[0], c);
-					}
-				}
-			}
-			
-			br.close();
-		} catch (IOException e) {
-			System.out.println("Datei nicht gefunden: " + commandsFile);
-		}*/
+		commands.add(CommandArchive.playTrackCommand);
+		commands.add(CommandArchive.skipTrackCommand);
+		commands.add(CommandArchive.stopTrackCommand);
+		commands.add(CommandArchive.shufflePlaylistCommand);
+		commands.add(CommandArchive.currentTrackCommand);
+		commands.add(CommandArchive.currentQueueCommand);
+		commands.add(CommandArchive.testCommand);
 	}
 }
