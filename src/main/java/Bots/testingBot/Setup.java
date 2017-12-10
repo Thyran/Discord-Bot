@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Setup {
+	private static final String addBotToServer = "https://discordapp.com/oauth2/authorize?&client_id=<CLIENT ID>&scope=bot&permissions=0";
+	
 	public static String loadToken() {
 		String result = "";
 		try {
