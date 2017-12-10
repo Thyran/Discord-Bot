@@ -109,7 +109,7 @@
 			</uses>
 		</command>
 		<command id="15">
-			<name>ShowUsesCommand</name>
+			<name>ShowCommandUsesCommand</name>
 			<id>15</id>
 			<uses>
 				<use>showUses</use>

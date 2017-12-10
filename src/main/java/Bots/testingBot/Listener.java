@@ -1,18 +1,14 @@
 package Bots.testingBot;
 
-import java.util.Random;
-
-import Bots.utils.Command;
-import Bots.utils.CommandArchive;
-import Bots.utils.CommandExecuter;
-import Bots.utils.CommandExecution;
-import Bots.utils.Commands;
-import Bots.utils.Input;
-import Bots.utils.InputEvent;
-import Bots.utils.SettingsIO;
-import Bots.utils.Execution;
-import Bots.utils.ExecutionSettings;
 import Bots.utils.Voids;
+import Bots.utils.Commands.Command;
+import Bots.utils.Commands.CommandArchive;
+import Bots.utils.Commands.CommandExecuter;
+import Bots.utils.Commands.CommandExecution;
+import Bots.utils.Commands.Commands;
+import Bots.utils.Input.Input;
+import Bots.utils.Input.InputEvent;
+import Bots.utils.Settings.SettingsIO;
 import net.dv8tion.jda.core.JDA.Status;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.events.StatusChangeEvent;
