@@ -19,12 +19,15 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 public class MusicManager {
+	
 	private static final int PLAYLIST_LIMIT = 1000;
 	private static final AudioPlayerManager MANAGER = new DefaultAudioPlayerManager();
 	private static final Map<Guild, Map.Entry<AudioPlayer, TrackManager>> PLAYERS = new HashMap<>();
+	private static final Map<Guild, VoiceChannel> channels = new HashMap<>();
 	
 	public MusicManager() {
 		AudioSourceManagers.registerRemoteSources(MANAGER);
@@ -57,6 +60,10 @@ public class MusicManager {
 		return PLAYERS.get(g).getValue();
 	}
 	
+	public VoiceChannel getChannel(Guild guild) {
+		return channels.get(guild);
+	}
+	
 	public boolean isIdle(Guild g) {
 		return !hasPlayer(g) || getPlayer(g).getPlayingTrack() == null;
 	}
@@ -64,6 +71,7 @@ public class MusicManager {
 	public void loadTrack(String identifier, Member author) {
 		Guild guild = author.getGuild();
 		getPlayer(guild);
+		channels.put(guild, author.getVoiceState().getChannel());
 		
 		MANAGER.setFrameBufferDuration(5000);
 		MANAGER.loadItemOrdered(guild, identifier, new AudioLoadResultHandler() {
@@ -88,6 +96,7 @@ public class MusicManager {
 	
 	public void skip(Guild g) {
 		getPlayer(g).stopTrack();
+		channels.remove(g);
 	}
 	
 	public String getTimestamp(long milis) {

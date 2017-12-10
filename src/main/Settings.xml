@@ -120,6 +120,7 @@
 			<id>16</id>
 			<uses>
 				<use>play</use>
+				<use>music</use>
 			</uses>
 		</command>
 		<command id="17">
@@ -127,6 +128,7 @@
 			<id>17</id>
 			<uses>
 				<use>skip</use>
+				<use>voteSkip</use>
 			</uses>
 		</command>
 		<command id="18">
@@ -148,6 +150,7 @@
 			<id>20</id>
 			<uses>
 				<use>currentTrack</use>
+				<use>trackInfo</use>
 				<use>now</use>
 			</uses>
 		</command>
@@ -156,6 +159,17 @@
 			<id>21</id>
 			<uses>
 				<use>currentQueue</use>
+				<use>queue</use>
+			</uses>
+		</command>
+		<command id="22">
+			<name>LastTrackCommand</name>
+			<id>22</id>
+			<uses>
+				<use>resume</use>
+				<use>lastTrack</use>
+				<use>last</use>
+				<use>playLast</use>
 			</uses>
 		</command>
 		<command id="100">
@@ -169,6 +183,15 @@
 		<guild id="0">
 			<name>Development Server</name>
 			<channel>bot-lane</channel>
+			<permittedUsers>
+				<user>Thyran</user>
+			</permittedUsers>
+			<permittedRoles>
+			</permittedRoles>
+		</guild>
+		<guild id="1">
+			<name>Games</name>
+			<channel>server_tallk</channel>
 			<permittedUsers>
 				<user>Thyran</user>
 			</permittedUsers>

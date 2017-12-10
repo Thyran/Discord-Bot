@@ -9,9 +9,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 
 public class CommandArchive {
 	private static MusicManager musicManager = new MusicManager();
+	private static String lastTrack = "";
+	private static List<Member> skipVotedMembers = new ArrayList<Member>();
 	
 	public static final Command rerollCommand = new Command("Roll", 0, true, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
@@ -169,8 +173,12 @@ public class CommandArchive {
 			String command = lastInput.getLastInput()[1];
 			String use = lastInput.getLastInput()[2];
 			
-			Commands.removeUseFromCommand(Commands.getCommandID(command), use);
-			SettingsIO.saveSettings(executer);
+			if (!(command.equals(addUseCommand.getName()))) {
+				Commands.removeUseFromCommand(Commands.getCommandID(command), use);
+				SettingsIO.saveSettings(executer);
+			} else {
+				Voids.sendMessageToCurrentChannel("Du kannst das AddUse command nicht bearbeiten", lastInput.getLastEvent());
+			}
 		}
 		
 		public void onError(Input lastInput) {
@@ -216,6 +224,7 @@ public class CommandArchive {
 			if (!(track.startsWith("https://") || track.startsWith("http://")))
 				track = "ytsearch: " + track;
 			
+			lastTrack = track;
 			musicManager.loadTrack(track, lastInput.getLastEvent().getMember());
 			
 			try {
@@ -227,14 +236,32 @@ public class CommandArchive {
 		}
 		
 		public void onError(Input lastInput) {
-			Voids.sendMessageToCurrentChannel("Play command needs Paramters (@Param: track)", lastInput.getLastEvent());
+				Voids.sendMessageToCurrentChannel("Play command needs Paramters (@Param: track)", lastInput.getLastEvent());
 		}
 	});
 	
 	public static final Command skipTrackCommand = new Command("SkipTrack", 17, true, true, false, new Execution() {
 		public void onExecution(Input lastInput, CommandExecuter executer) {
-			if (!musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
-				musicManager.skip(lastInput.getLastEvent().getGuild());
+			if (lastInput.getLastEvent().getMember().getVoiceState().getChannel().equals(musicManager.getChannel(lastInput.getLastEvent().getGuild()))) {
+				if (!skipVotedMembers.contains(lastInput.getLastEvent().getMember())) {
+					skipVotedMembers.add(lastInput.getLastEvent().getMember());
+					Voids.sendMessageToCurrentChannel(lastInput.getLastEvent().getAuthor().getName() + " hat für einen Skip gevoted", lastInput.getLastEvent());
+				} else {
+					Voids.sendMessageToCurrentChannel(lastInput.getLastEvent().getAuthor().getName() + ", du hast bereits gevoted", lastInput.getLastEvent());
+				}
+				Voids.sendMessageToCurrentChannel("Aktueller Stand: " + 
+					new Integer(skipVotedMembers.size()).toString() + "/" + 
+					new Integer(musicManager.getChannel(lastInput.getLastEvent().getGuild()).getMembers().size() -1).toString(), 
+					lastInput.getLastEvent());
+				
+				if (skipVotedMembers.size() >= ((musicManager.getChannel(lastInput.getLastEvent().getGuild()).getMembers().size() -1) / 2)) {
+					if (!musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
+						musicManager.skip(lastInput.getLastEvent().getGuild());
+						skipVotedMembers.clear();
+					}
+				}
+			} else {
+				Voids.sendMessageToCurrentChannel("In diesem Channel wird zur Zeit keine Musik gespielt", lastInput.getLastEvent());
 			}
 		}
 		
@@ -311,7 +338,7 @@ public class CommandArchive {
 					.setDescription(
 							"**CURRENT QUEUE:**\n" +
 							"*[" + musicManager.getManager(lastInput.getLastEvent().getGuild()).getQueue().stream() +
-							" Tracks | Side " + sideNumb + " / " + sideNumbAll + "]*" +
+							" Tracks | Side " + sideNumb + " / " + sideNumbAll + "]*\n\n" +
 							out)
 					.build(), lastInput.getLastEvent());
 			}
@@ -319,6 +346,29 @@ public class CommandArchive {
 		
 		public void onError(Input lastInput) {
 			Voids.sendMessageToCurrentChannel("Fehler beim Anzeigen der Aktuellen Queue", lastInput.getLastEvent());
+		}
+	});
+	
+	public static final Command lastTrackCommand = new Command("LastTrack", 22, true, true, false, new Execution() {
+		public void onExecution(Input lastInput, CommandExecuter executer) {
+			if (musicManager.isIdle(lastInput.getLastEvent().getGuild())) {
+				if (!lastTrack.equals("")) {
+					musicManager.loadTrack(lastTrack, lastInput.getLastEvent().getMember());
+					
+					try {
+						Thread.sleep(1000);
+						executer.appendCommandExecution(new CommandExecution(new Input().setLastEvent(null).setLastEvent(lastInput.getLastEvent()), currentTrackCommand));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				} else {
+					Voids.sendMessageToCurrentChannel("ResumeTrack command needs a Track first (use Play command)", lastInput.getLastEvent());
+				}
+			}
+		}
+		
+		public void onError(Input lastInput) {
+			Voids.sendMessageToCurrentChannel("Fehler beim spielen des letzten Tracks", lastInput.getLastEvent());
 		}
 	});
 	

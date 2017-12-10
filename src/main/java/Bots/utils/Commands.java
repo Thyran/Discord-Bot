@@ -97,6 +97,7 @@ public class Commands {
 		commands.add(CommandArchive.shufflePlaylistCommand);
 		commands.add(CommandArchive.currentTrackCommand);
 		commands.add(CommandArchive.currentQueueCommand);
+		commands.add(CommandArchive.lastTrackCommand);
 		commands.add(CommandArchive.testCommand);
 	}
 }
